@@ -1,12 +1,7 @@
-#define SETUP_H
+#define __MAIN_H
 
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_uart.h"
 #include "defines.h"
-
-
-void MX_GPIO_Init(void);
-void MX_UART1_Init(void);
-
-
-
+#include "setup.h"
+#include <string.h>

@@ -2,4 +2,3 @@
 
 #define FRONT_LED_PIN GPIO_PIN_13
 #define FRONT_LED_PORT GPIOC
-

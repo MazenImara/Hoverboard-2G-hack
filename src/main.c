@@ -1,37 +1,24 @@
-#include "stm32f1xx_hal.h"
+#include "main.h"
 
 void SystemClock_Config(void);
-void MX_GPIO_Init(void);
+
+extern UART_HandleTypeDef huart1;
 
 int main(void)
 {
   HAL_Init();
+  SystemClock_Config();
   MX_GPIO_Init();
+  MX_UART1_Init();
 
-  while (1)
+  char msg[] = "Hi\r\n";
+
+  while(1)
   {
-	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-	HAL_Delay(500);
+    HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+    HAL_GPIO_TogglePin(FRONT_LED_PORT, FRONT_LED_PIN);
+    HAL_Delay(1000);
   }
-  
-}
-void MX_GPIO_Init(void) {
-
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-
-
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-
-  /*Configure GPIO pin : PC13 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 
 void SystemClock_Config(void)
@@ -56,5 +43,6 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
   HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0);
 }
