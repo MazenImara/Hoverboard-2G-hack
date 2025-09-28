@@ -15,14 +15,29 @@ void MX_GPIO_Init(void) {
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
-
+  // Output mode
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 
   /*Configure GPIO pin : PC13 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = FRONT_LED_PIN;
+  HAL_GPIO_Init(FRONT_LED_PORT, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : P */
+  GPIO_InitStruct.Pin = BUZZER_PIN;
+  HAL_GPIO_Init(BUZZER_PORT, &GPIO_InitStruct);
+
+
+
+  // Input mode
+  GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;
+
+  /*Configure GPIO pin : P */
+  GPIO_InitStruct.Pin = POWER_BTN_PIN;
+  HAL_GPIO_Init(POWER_BTN_PORT, &GPIO_InitStruct);
+
+
 }
 
 void MX_UART1_Init(void)

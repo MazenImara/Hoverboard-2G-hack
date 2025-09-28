@@ -13,11 +13,19 @@ int main(void)
 
   char msg[] = "Hi\r\n";
 
+      HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
   while(1)
   {
-    HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
-    HAL_GPIO_TogglePin(FRONT_LED_PORT, FRONT_LED_PIN);
-    HAL_Delay(1000);
+    
+    if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN))
+    {
+      HAL_GPIO_WritePin(FRONT_LED_PORT, FRONT_LED_PIN, GPIO_PIN_SET);
+    }
+    else
+    {
+      HAL_GPIO_WritePin(FRONT_LED_PORT, FRONT_LED_PIN, GPIO_PIN_RESET);
+    }
+
   }
 }
 
