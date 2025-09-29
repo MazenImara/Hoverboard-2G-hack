@@ -3,22 +3,42 @@
 void SystemClock_Config(void);
 
 extern UART_HandleTypeDef huart1;
+extern ADC_HandleTypeDef hadc1;
+
+uint32_t throttleValue = 0;
+uint32_t brakeValue = 0;
 
 int main(void)
 {
-  HAL_Init();
+  HAL_Init();               
   SystemClock_Config();
   MX_GPIO_Init();
   MX_UART1_Init();
-  
-
+  MX_ADC1_Init();
+  printf("start Loop\r\n");
   while(1)
   {
-    
+        // قراءة دواسة التيرتل (PC15)
+    ADC_ChannelConfTypeDef sConfig = {0};
+    sConfig.Rank = ADC_REGULAR_RANK_1;
+    sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;
+
+    // قراءة دواسة البريك (PA6)
+    sConfig.Channel = ADC_CHANNEL_6;   // PA6 = ADC_IN6
+    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+    HAL_ADC_Start(&hadc1);
+    HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+    throttleValue = HAL_ADC_GetValue(&hadc1);
+    HAL_ADC_Stop(&hadc1);
+
+    // الآن يمكنك استخدام throttleValue و brakeValue حسب التطبيق
+    printf("Throttle: %lu, break: %lu \r\n", throttleValue, brakeValue);
+    HAL_Delay(1000);  // تأخير بسيط
+    printf("power btn: %lu \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
     if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN))
     {
       HAL_GPIO_WritePin(FRONT_LED_PORT, FRONT_LED_PIN, GPIO_PIN_SET);
-      printf("Hello from STM32!\r\n");
+      //printf("Hello from STM32!\r\n");
       HAL_Delay(1000);
     }
     else
