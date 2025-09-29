@@ -2,4 +2,4 @@
 
 #include "setup.h"
 
-uint16_t readThrottle(void);
+void readThrottle(void);

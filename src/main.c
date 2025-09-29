@@ -5,7 +5,7 @@ void SystemClock_Config(void);
 extern UART_HandleTypeDef huart1;
 extern ADC_HandleTypeDef hadc1;
 
-uint32_t throttleValue = 0;
+extern uint32_t throttleValue;
 uint32_t brakeValue = 0;
 
 int main(void)
@@ -26,7 +26,9 @@ int main(void)
   printf("start Loop\r\n");
   while(1)
   {
-    throttleValue = readThrottle();
+    readThrottle();
+
+    
     // الآن يمكنك استخدام throttleValue و brakeValue حسب التطبيق
     printf("Throttle: %lu \r\n", throttleValue);
     HAL_Delay(1000);  // تأخير بسيط
