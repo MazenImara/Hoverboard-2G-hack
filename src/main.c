@@ -15,11 +15,10 @@ int main(void)
   MX_GPIO_Init();
   MX_UART1_Init();
   MX_ADC1_Init();
+  MX_TIM3_Init();
 
 
   power_on();
-
-
 
 
 
@@ -38,10 +37,10 @@ int main(void)
     throttleValue = HAL_ADC_GetValue(&hadc1);
     HAL_ADC_Stop(&hadc1);
 
-    // الآن يمكنك استخدام throttleValue و brakeValue حسب التطبيق
+/*     // الآن يمكنك استخدام throttleValue و brakeValue حسب التطبيق
     printf("Throttle: %lu, break: %lu \r\n", throttleValue, brakeValue);
     HAL_Delay(1000);  // تأخير بسيط
-    printf("power btn: %lu \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
+    printf("power btn: %lu \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN)); */
 
 
 

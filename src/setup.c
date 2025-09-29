@@ -5,6 +5,7 @@
 
 UART_HandleTypeDef huart1;
 ADC_HandleTypeDef hadc1;
+TIM_HandleTypeDef htim3;
 
 
 void MX_GPIO_Init(void) {
@@ -16,7 +17,7 @@ void MX_GPIO_Init(void) {
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
-  // Output mode
+  /** ========== output mode ========= **/
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -25,19 +26,14 @@ void MX_GPIO_Init(void) {
   GPIO_InitStruct.Pin = FRONT_LED_PIN;
   HAL_GPIO_Init(FRONT_LED_PORT, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : P */
-  GPIO_InitStruct.Pin = BUZZER_PIN;
-  HAL_GPIO_Init(BUZZER_PORT, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : P */
+    /*Configure GPIO pin : P */
   GPIO_InitStruct.Pin = SELF_HOLD_PIN;
   HAL_GPIO_Init(SELF_HOLD_PORT, &GPIO_InitStruct);
 
-
-
-  // Input mode
+  /** ========== input mode ========= **/
   GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;
-
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   /*Configure GPIO pin : P */
   GPIO_InitStruct.Pin = POWER_BTN_PIN;
   HAL_GPIO_Init(POWER_BTN_PORT, &GPIO_InitStruct);
@@ -45,11 +41,20 @@ void MX_GPIO_Init(void) {
   /*Configure GPIO pin : P */
   GPIO_InitStruct.Pin = BREAK_PIN;
   HAL_GPIO_Init(BREAK_PORT, &GPIO_InitStruct);
-  
 
-  // Analog
+  /** ========== Alternate Function mode (PWM) ========= **/
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;  // Alternate Function Push-Pull
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+
+  /*Configure GPIO pin : P */
+  GPIO_InitStruct.Pin = BUZZER_PIN;
+  HAL_GPIO_Init(BUZZER_PORT, &GPIO_InitStruct);
+
+  /** ========== Analog mode ========= **/
   __HAL_RCC_ADC1_CLK_ENABLE();
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
 
     /*Configure GPIO pin : P */
   GPIO_InitStruct.Pin = THROTTLE_PIN;
@@ -82,4 +87,25 @@ void MX_ADC1_Init(void)
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 1;
   HAL_ADC_Init(&hadc1);
+}
+
+void MX_TIM3_Init(void)
+{
+    __HAL_RCC_TIM3_CLK_ENABLE();  // تفعيل ساعة المؤقت
+
+    TIM_OC_InitTypeDef sConfigOC = {0};
+
+    htim3.Instance = TIM3;
+    htim3.Init.Prescaler = 72 - 1;           // (72MHz / 72) = 1MHz
+    htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim3.Init.Period = 500 - 1;             // 1MHz / 500 = 2kHz → صوت متوسط
+    htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    HAL_TIM_PWM_Init(&htim3);
+
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse = 250;                   // 50% duty cycle
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+
+    HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_4);
 }

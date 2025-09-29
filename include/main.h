@@ -7,3 +7,4 @@
 #include <stdio.h>
 #include <string.h>
 #include "power.h"
+#include "melody.h"
