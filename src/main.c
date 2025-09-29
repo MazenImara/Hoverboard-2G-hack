@@ -15,15 +15,22 @@ int main(void)
   MX_GPIO_Init();
   MX_UART1_Init();
   MX_ADC1_Init();
+
+
+  power_on();
+
+
+
+
+
+
   printf("start Loop\r\n");
   while(1)
   {
-        // قراءة دواسة التيرتل (PC15)
+    // قراءة دواسة البريك (PA6)
     ADC_ChannelConfTypeDef sConfig = {0};
     sConfig.Rank = ADC_REGULAR_RANK_1;
     sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;
-
-    // قراءة دواسة البريك (PA6)
     sConfig.Channel = ADC_CHANNEL_6;   // PA6 = ADC_IN6
     HAL_ADC_ConfigChannel(&hadc1, &sConfig);
     HAL_ADC_Start(&hadc1);
@@ -35,17 +42,14 @@ int main(void)
     printf("Throttle: %lu, break: %lu \r\n", throttleValue, brakeValue);
     HAL_Delay(1000);  // تأخير بسيط
     printf("power btn: %lu \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
+
+
+
+
     if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN))
     {
-      HAL_GPIO_WritePin(FRONT_LED_PORT, FRONT_LED_PIN, GPIO_PIN_SET);
-      //printf("Hello from STM32!\r\n");
-      HAL_Delay(1000);
-    }
-    else
-    {
-      HAL_GPIO_WritePin(FRONT_LED_PORT, FRONT_LED_PIN, GPIO_PIN_RESET);
-    }
-
+      power_off();
+    }    
   }
 }
 

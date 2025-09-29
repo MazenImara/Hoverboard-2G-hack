@@ -29,6 +29,10 @@ void MX_GPIO_Init(void) {
   GPIO_InitStruct.Pin = BUZZER_PIN;
   HAL_GPIO_Init(BUZZER_PORT, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : P */
+  GPIO_InitStruct.Pin = SELF_HOLD_PIN;
+  HAL_GPIO_Init(SELF_HOLD_PORT, &GPIO_InitStruct);
+
 
 
   // Input mode
