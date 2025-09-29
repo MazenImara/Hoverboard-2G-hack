@@ -6,6 +6,7 @@
 UART_HandleTypeDef huart1;
 ADC_HandleTypeDef hadc1;
 TIM_HandleTypeDef htim3;
+uint16_t adcValues[ADC_CHANNEL_COUNT];  // مصفوفة تستقبل القيم من DMA
 
 
 void MX_GPIO_Init(void) {
@@ -77,14 +78,37 @@ void MX_UART1_Init(void)
 
 void MX_ADC1_Init(void)
 {
+  ADC_ChannelConfTypeDef sConfig = {0};
   hadc1.Instance = ADC1;
-  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;  // مهم: لتفعيل المسح المتعدد
+  hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.NbrOfConversion = ADC_CHANNEL_COUNT;
   HAL_ADC_Init(&hadc1);
+
+  // قناة 1: Throttle (PA6 = ADC_CHANNEL_6)
+  sConfig.Channel = ADC_CHANNEL_6;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;
+  HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+/* 
+  // قناة 2: Current (مثلاً PA2 = ADC_CHANNEL_2)
+  sConfig.Channel = ADC_CHANNEL_2;
+  sConfig.Rank = ADC_REGULAR_RANK_2;
+  HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+
+  // قناة 3: Battery Voltage (مثلاً PA1 = ADC_CHANNEL_1)
+  sConfig.Channel = ADC_CHANNEL_1;
+  sConfig.Rank = ADC_REGULAR_RANK_3;
+  HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+
+  // قناة 4: Temperature (مثلاً PA3 = ADC_CHANNEL_3)
+  sConfig.Channel = ADC_CHANNEL_3;
+  sConfig.Rank = ADC_REGULAR_RANK_4;
+  HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+   */
 }
 
 void MX_TIM3_Init(void)

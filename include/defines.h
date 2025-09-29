@@ -1,5 +1,7 @@
 #define DEFINES_H
 
+#define ADC_CHANNEL_COUNT 4  // عدد القنوات
+
 #define FRONT_LED_PIN GPIO_PIN_13
 #define FRONT_LED_PORT GPIOC
 

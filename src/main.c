@@ -4,33 +4,31 @@ void SystemClock_Config(void);
 
 extern UART_HandleTypeDef huart1;
 extern ADC_HandleTypeDef hadc1;
-
-extern uint32_t throttleValue;
-uint32_t brakeValue = 0;
+extern uint16_t adcValues[ADC_CHANNEL_COUNT];
 
 int main(void)
 {
   HAL_Init();               
   SystemClock_Config();
   MX_GPIO_Init();
-  MX_UART1_Init();
   MX_ADC1_Init();
+  MX_UART1_Init();
   MX_TIM3_Init();
 
 
   power_on();
 
-
+  // 7. تشغيل ADC باستخدام DMA
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adcValues, ADC_CHANNEL_COUNT);
 
 
   printf("start Loop\r\n");
   while(1)
   {
-    readThrottle();
 
-    
+
     // الآن يمكنك استخدام throttleValue و brakeValue حسب التطبيق
-    printf("Throttle: %lu \r\n", throttleValue);
+    printf("Throttle: %lu \r\n", adcValues[0]);
     HAL_Delay(1000);  // تأخير بسيط
     //printf("power btn: %lu \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
 
