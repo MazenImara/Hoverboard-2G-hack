@@ -26,21 +26,11 @@ int main(void)
   printf("start Loop\r\n");
   while(1)
   {
-    // قراءة دواسة البريك (PA6)
-    ADC_ChannelConfTypeDef sConfig = {0};
-    sConfig.Rank = ADC_REGULAR_RANK_1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;
-    sConfig.Channel = ADC_CHANNEL_6;   // PA6 = ADC_IN6
-    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-    HAL_ADC_Start(&hadc1);
-    HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-    throttleValue = HAL_ADC_GetValue(&hadc1);
-    HAL_ADC_Stop(&hadc1);
-
-/*     // الآن يمكنك استخدام throttleValue و brakeValue حسب التطبيق
-    printf("Throttle: %lu, break: %lu \r\n", throttleValue, brakeValue);
+    throttleValue = readThrottle();
+    // الآن يمكنك استخدام throttleValue و brakeValue حسب التطبيق
+    printf("Throttle: %lu \r\n", throttleValue);
     HAL_Delay(1000);  // تأخير بسيط
-    printf("power btn: %lu \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN)); */
+    //printf("power btn: %lu \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
 
 
 

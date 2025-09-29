@@ -8,3 +8,4 @@
 #include <string.h>
 #include "power.h"
 #include "melody.h"
+#include "util.h"

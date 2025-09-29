@@ -77,8 +77,6 @@ void MX_UART1_Init(void)
 
 void MX_ADC1_Init(void)
 {
-  ADC_ChannelConfTypeDef sConfig = {0};
-
   hadc1.Instance = ADC1;
   hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
