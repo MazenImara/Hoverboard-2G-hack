@@ -10,16 +10,16 @@ int main(void)
   SystemClock_Config();
   MX_GPIO_Init();
   MX_UART1_Init();
+  
 
-  char msg[] = "Hi\r\n";
-
-      HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
   while(1)
   {
     
     if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN))
     {
       HAL_GPIO_WritePin(FRONT_LED_PORT, FRONT_LED_PIN, GPIO_PIN_SET);
+      printf("Hello from STM32!\r\n");
+      HAL_Delay(1000);
     }
     else
     {
@@ -53,4 +53,10 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0);
+}
+
+
+int _write(int file, char *data, int len) {
+    HAL_UART_Transmit(&huart1, (uint8_t*)data, len, HAL_MAX_DELAY);
+    return len;
 }
