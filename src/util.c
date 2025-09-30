@@ -31,17 +31,17 @@ float readInternalTemperature(void)
     return temperature;
 }
 
-void readHallSensors(void)
+uint8_t readHallSensors(void)
 {
-    uint8_t hallGA = HAL_GPIO_ReadPin(HALL_PORT, HALL_A_PIN);  // Green
-    uint8_t hallYB = HAL_GPIO_ReadPin(HALL_PORT, HALL_B_PIN);  // Yellow
-    uint8_t hallBC = HAL_GPIO_ReadPin(HALL_PORT, HALL_C_PIN);  // Blue
+  uint8_t hallGA = HAL_GPIO_ReadPin(HALL_PORT, HALL_A_PIN);  // Green
+  uint8_t hallYB = HAL_GPIO_ReadPin(HALL_PORT, HALL_B_PIN);  // Yellow
+  uint8_t hallBC = HAL_GPIO_ReadPin(HALL_PORT, HALL_C_PIN);  // Blue
 
-    uint8_t hallState = (hallGA << 2) | (hallYB << 1) | hallBC;
+  uint8_t hallState = (hallBC << 2) | (hallYB << 1) | hallGA;
 
-    printf("Hall A: %d, Hall B: %d, Hall C: %d => State: %d\r\n", hallGA, hallYB, hallBC, hallState);
+  printf("Hall A: %d, Hall B: %d, Hall C: %d => State: %d\r\n", hallGA, hallYB, hallBC, hallState);
 
-    HAL_Delay(200);  // للتقليل من سرعة الطباعة
+  return hallState;
 }
 
 uint16_t getThrottlePercent(void)

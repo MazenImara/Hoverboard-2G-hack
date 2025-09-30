@@ -17,13 +17,25 @@ int main(void)
   MX_ADC1_Init();
   MX_UART1_Init();
 
-  //MX_TIM1_Init();
-  //Start_PWM_TIM1();
+  printf("\r\n");
 
+  printf("\r\n");
+
+  printf("\r\n");
+
+  printf("before MX_TIM1_Init\r\n");
+  MX_TIM1_Init();
+
+  printf("before MX_TIM3_Init\r\n");
   MX_TIM3_Init();
 
 
   power_on();
+
+  HAL_Delay(4000);
+
+  printf("before Start_PWM_TIM1\r\n");
+  Start_PWM_TIM1();
 
   int printTimer = 0;
   printf("start Loop\r\n");
@@ -42,11 +54,11 @@ int main(void)
           //printf("power btn: %.2f \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
     }
      */
-    printf("Throttle        : %i \r\n", adcValues[0]); 
+    /* printf("Throttle        : %i \r\n", adcValues[0]); 
     printf("Throttle percent: %i \r\n", getThrottlePercent()); 
     
     HAL_Delay(200);
-
+ */
 /*
     uint8_t hall_a = HAL_GPIO_ReadPin(HALL_PORT, HALL_A_PIN);
     uint8_t hall_b = HAL_GPIO_ReadPin(HALL_PORT, HALL_B_PIN);
@@ -58,7 +70,7 @@ int main(void)
 
     //set_commutation(hall_state);
 
-    HAL_Delay(1);  // للتجربة فقط. لاحقًا نستخدم interrupt.
+    //HAL_Delay(1);  // للتجربة فقط. لاحقًا نستخدم interrupt.
 
 
     if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN) 
