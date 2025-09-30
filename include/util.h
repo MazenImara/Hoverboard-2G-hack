@@ -2,3 +2,4 @@
 
 #include "setup.h"
 
+float readBatteryVoltage(void);

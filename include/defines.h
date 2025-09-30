@@ -1,6 +1,9 @@
 #define DEFINES_H
 
 #define ADC_CHANNEL_COUNT 4  // عدد القنوات
+#define MIN_BATTERY_VOL 30.1
+#define MAX_BATTERY_VOL 41.9
+
 
 #define FRONT_LED_PIN GPIO_PIN_13
 #define FRONT_LED_PORT GPIOC
@@ -19,3 +22,6 @@
 
 #define BREAK_PIN GPIO_PIN_15
 #define BREAK_PORT GPIOC
+
+#define BATTERY_V_PIN GPIO_PIN_5
+#define BATTERY_V_PORT GPIOA

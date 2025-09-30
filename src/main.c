@@ -6,6 +6,8 @@ extern UART_HandleTypeDef huart1;
 extern ADC_HandleTypeDef hadc1;
 extern uint16_t adcValues[ADC_CHANNEL_COUNT];
 
+float batteryVolt = 0;
+
 int main(void)
 {
   HAL_Init();               
@@ -25,20 +27,21 @@ int main(void)
   printf("start Loop\r\n");
   while(1)
   {
-
-
-    // الآن يمكنك استخدام throttleValue و brakeValue حسب التطبيق
-    printf("Throttle: %lu \r\n", adcValues[0]);
+       batteryVolt = readBatteryVoltage();
+       printf("Battery Voltage: %d.%02d V\r\n", (int)batteryVolt, (int)((batteryVolt - (int)batteryVolt) * 100));
+    HAL_Delay(500);
+    //printf("adcValues[2] raw: %i \r\n", adcValues[2]);
     HAL_Delay(1000);  // تأخير بسيط
-    //printf("power btn: %lu \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
+    //printf("power btn: %.2f \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
 
 
 
 
-    if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN))
+    if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN) || batteryVolt < MIN_BATTERY_VOL || batteryVolt > MAX_BATTERY_VOL)
     {
       power_off();
-    }    
+    }
+        
   }
 }
 
@@ -69,7 +72,3 @@ void SystemClock_Config(void)
 }
 
 
-int _write(int file, char *data, int len) {
-    HAL_UART_Transmit(&huart1, (uint8_t*)data, len, HAL_MAX_DELAY);
-    return len;
-}
