@@ -21,8 +21,7 @@ int main(void)
 
   power_on();
 
-  // 7. تشغيل ADC باستخدام DMA
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adcValues, ADC_CHANNEL_COUNT);
+
 
 
   printf("start Loop\r\n");
@@ -31,7 +30,8 @@ int main(void)
        batteryVolt = readBatteryVoltage();
        temperature = readInternalTemperature();
        //printf("Battery Voltage: %d.%02d V\r\n", (int)batteryVolt, (int)((batteryVolt - (int)batteryVolt) * 100));
-       printf("temperture: %d.%02d \r\n", (int)temperature, (int)((temperature - (int)temperature) * 100));
+       //printf("temperture: %d.%02d C\r\n", (int)temperature, (int)((temperature - (int)temperature) * 100));
+       printf("Current Sensor ADC Value: %lu\n", adcValues[1]);
        //printf("tmp: %lu \r\n", temperature);
     HAL_Delay(500);
     //printf("adcValues[2] raw: %i \r\n", adcValues[2]);
@@ -46,7 +46,6 @@ int main(void)
       || temperature > MAX_TEMPERATURE
     )
     {
-      power_on_melody();
       power_off();
     }
         

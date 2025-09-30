@@ -65,6 +65,10 @@ void MX_GPIO_Init(void) {
   GPIO_InitStruct.Pin = BATTERY_V_PIN;
   HAL_GPIO_Init(BATTERY_V_PORT, &GPIO_InitStruct);
 
+    /*Configure GPIO pin : P */
+  GPIO_InitStruct.Pin = CURRENT_PIN;
+  HAL_GPIO_Init(CURRENT_PORT, &GPIO_InitStruct);
+
 }
 
 void MX_UART1_Init(void)
@@ -102,12 +106,13 @@ void MX_ADC1_Init(void)
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;
   HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-/* 
+
   // قناة 2: Current (مثلاً PA2 = ADC_CHANNEL_2)
-  sConfig.Channel = ADC_CHANNEL_2;
+  sConfig.Channel = CURRENT_CH;
   sConfig.Rank = ADC_REGULAR_RANK_2;
+  sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
   HAL_ADC_ConfigChannel(&hadc1, &sConfig);
- */
+
   // قناة 3: Battery Voltage (مثلاً PA5 = ADC_CHANNEL_5)
   sConfig.Channel = BATTERY_V_CH;
   sConfig.Rank = ADC_REGULAR_RANK_3;
@@ -118,6 +123,9 @@ void MX_ADC1_Init(void)
   sConfig.Rank = ADC_REGULAR_RANK_4;
   sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
   HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+
+    // 7. تشغيل ADC باستخدام DMA
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adcValues, ADC_CHANNEL_COUNT);
 }
 
 void MX_TIM3_Init(void)
