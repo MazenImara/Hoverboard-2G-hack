@@ -34,3 +34,21 @@
 #define CURRENT_PIN GPIO_PIN_7
 #define CURRENT_PORT GPIOA
 #define CURRENT_CH ADC_CHANNEL_7
+
+// Hall pins
+#define HALL_A_PIN    GPIO_PIN_0
+#define HALL_B_PIN    GPIO_PIN_1
+#define HALL_C_PIN    GPIO_PIN_2
+#define HALL_PORT     GPIOA
+
+
+// High-side phases
+#define PHASE_U_HIGH_PORT GPIOA
+#define PHASE_U_HIGH_PIN  GPIO_PIN_10
+
+#define PHASE_V_HIGH_PORT GPIOA
+#define PHASE_V_HIGH_PIN  GPIO_PIN_9
+
+#define PHASE_W_HIGH_PORT GPIOA
+#define PHASE_W_HIGH_PIN  GPIO_PIN_8
+

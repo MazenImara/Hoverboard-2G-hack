@@ -44,6 +44,10 @@ void MX_GPIO_Init(void) {
   GPIO_InitStruct.Pin = BREAK_PIN;
   HAL_GPIO_Init(BREAK_PORT, &GPIO_InitStruct);
 
+    /*Configure GPIO pin : for hall sensor */
+  GPIO_InitStruct.Pin = HALL_A_PIN | HALL_B_PIN | HALL_C_PIN;
+  HAL_GPIO_Init(HALL_PORT, &GPIO_InitStruct);
+
   /** ========== Alternate Function mode (PWM) ========= **/
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;  // Alternate Function Push-Pull
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -55,8 +59,9 @@ void MX_GPIO_Init(void) {
 
   /*Configure GPIO pins : for motor */
   // إعداد Pins القنوات العادية (High-side): PA8, PA9, PA10
-  GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10;
+  GPIO_InitStruct.Pin = PHASE_U_HIGH_PIN | PHASE_V_HIGH_PIN | PHASE_W_HIGH_PIN;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -176,12 +181,8 @@ void MX_TIM1_Init(void)
   htim1.Init.Period = 1000 - 1;   // تردد PWM = 1kHz
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
-
-  if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
-  {
-      // خطأ في التهيئة
-      Error_Handler();
-  }
+  
+  HAL_TIM_PWM_Init(&htim1);
 
     // إعداد قناة PWM
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
@@ -203,22 +204,20 @@ void MX_TIM1_Init(void)
   sBreakDeadTimeConfig.DeadTime = 72; // 72 عداد = 72 ميكروثانية عند 1MHz → عدل حسب حاجتك (مثلاً 1µs = 1 عداد)
   sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
   sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
+  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_ENABLE;
 
-  if (HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig) != HAL_OK)
-  {
-      // خطأ في التهيئة
-       Error_Handler();
-  }
+  HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig);
 }
 
 void Start_PWM_TIM1(void)
-{
+{  
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
 
   HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
+
 }

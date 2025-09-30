@@ -16,34 +16,55 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC1_Init();
   MX_UART1_Init();
+
+  //MX_TIM1_Init();
+  //Start_PWM_TIM1();
+
   MX_TIM3_Init();
 
 
   power_on();
 
-
-
-
+  int printTimer = 0;
   printf("start Loop\r\n");
   while(1)
   {
-       batteryVolt = readBatteryVoltage();
-       temperature = readInternalTemperature();
-       //printf("Battery Voltage: %d.%02d V\r\n", (int)batteryVolt, (int)((batteryVolt - (int)batteryVolt) * 100));
-       //printf("temperture: %d.%02d C\r\n", (int)temperature, (int)((temperature - (int)temperature) * 100));
-       printf("Current Sensor ADC Value: %lu\n", adcValues[1]);
-       //printf("tmp: %lu \r\n", temperature);
-    HAL_Delay(500);
-    //printf("adcValues[2] raw: %i \r\n", adcValues[2]);
-    //printf("power btn: %.2f \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
+    /* 
+    printTimer++;
+    if (printTimer > 500)
+    {
+      printTimer = 0;
+      batteryVolt = readBatteryVoltage();
+      temperature = readInternalTemperature();
+      printf("temperture.    : %d.%02d C\r\n", (int)temperature, (int)((temperature - (int)temperature) * 100));
+      printf("Battery Voltage: %d.%02d V\r\n", (int)batteryVolt, (int)((batteryVolt - (int)batteryVolt) * 100));
+      printf("Current        : %lu A\r\n", adcValues[1]); 
+          //printf("power btn: %.2f \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
+    }
+     */
+    printf("Throttle        : %i \r\n", adcValues[0]); 
+    HAL_Delay(200);
 
+/*
+    uint8_t hall_a = HAL_GPIO_ReadPin(HALL_PORT, HALL_A_PIN);
+    uint8_t hall_b = HAL_GPIO_ReadPin(HALL_PORT, HALL_B_PIN);
+    uint8_t hall_c = HAL_GPIO_ReadPin(HALL_PORT, HALL_C_PIN);
 
+    uint8_t hall_state = (hall_a << 2) | (hall_b << 1) | hall_c;
+ */
+    //readHallSensors();
+
+    //set_commutation(hall_state);
+
+    HAL_Delay(1);  // للتجربة فقط. لاحقًا نستخدم interrupt.
 
 
     if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN) 
+/* 
       || batteryVolt < MIN_BATTERY_VOL 
       || batteryVolt > MAX_BATTERY_VOL
       || temperature > MAX_TEMPERATURE
+       */
     )
     {
       power_off();
