@@ -43,6 +43,8 @@ int main(void)
     }
      */
     printf("Throttle        : %i \r\n", adcValues[0]); 
+    printf("Throttle percent: %i \r\n", getThrottlePercent()); 
+    
     HAL_Delay(200);
 
 /*

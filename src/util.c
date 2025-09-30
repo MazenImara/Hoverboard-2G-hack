@@ -44,7 +44,26 @@ void readHallSensors(void)
     HAL_Delay(200);  // للتقليل من سرعة الطباعة
 }
 
+uint16_t getThrottlePercent(void)
+{
+    uint16_t raw = adcValues[0]; // قيمة ADC
+    // نفترض أن ADC من 0 إلى 4095
 
+    // تعيين حدود الدواسة (تعدل حسب جهازك)
+    uint16_t min_adc = 870;  // أقل قيمة تعتبر بداية
+    uint16_t max_adc = 2818; // أعلى قيمة للدواسة
+
+    if (raw < min_adc)
+        return 0;  // أقل من الحد الأدنى → 0%
+
+    if (raw > max_adc)
+        return 100; // أعلى من الحد الأعلى → 100%
+
+    // حساب النسبة مابين 0 و 100
+    uint32_t percent = (uint32_t)(raw - min_adc) * 100 / (max_adc - min_adc);
+
+    return (uint8_t)percent;
+}
 void set_commutation(uint8_t hall_state)
 {
     // أولًا: أوقف كل high-sides
