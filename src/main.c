@@ -7,6 +7,7 @@ extern ADC_HandleTypeDef hadc1;
 extern uint16_t adcValues[ADC_CHANNEL_COUNT];
 
 float batteryVolt = 0;
+float temperature = 0;
 
 int main(void)
 {
@@ -28,17 +29,24 @@ int main(void)
   while(1)
   {
        batteryVolt = readBatteryVoltage();
-       printf("Battery Voltage: %d.%02d V\r\n", (int)batteryVolt, (int)((batteryVolt - (int)batteryVolt) * 100));
+       temperature = readInternalTemperature();
+       //printf("Battery Voltage: %d.%02d V\r\n", (int)batteryVolt, (int)((batteryVolt - (int)batteryVolt) * 100));
+       printf("temperture: %d.%02d \r\n", (int)temperature, (int)((temperature - (int)temperature) * 100));
+       //printf("tmp: %lu \r\n", temperature);
     HAL_Delay(500);
     //printf("adcValues[2] raw: %i \r\n", adcValues[2]);
-    HAL_Delay(1000);  // تأخير بسيط
     //printf("power btn: %.2f \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
 
 
 
 
-    if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN) || batteryVolt < MIN_BATTERY_VOL || batteryVolt > MAX_BATTERY_VOL)
+    if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN) 
+      || batteryVolt < MIN_BATTERY_VOL 
+      || batteryVolt > MAX_BATTERY_VOL
+      || temperature > MAX_TEMPERATURE
+    )
     {
+      power_on_melody();
       power_off();
     }
         

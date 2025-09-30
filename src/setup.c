@@ -82,6 +82,8 @@ void MX_UART1_Init(void)
 
 void MX_ADC1_Init(void)
 {
+  __HAL_RCC_ADC1_CLK_ENABLE();
+
   ADC_ChannelConfTypeDef sConfig = {0};
   hadc1.Instance = ADC1;
   hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;  // مهم: لتفعيل المسح المتعدد
@@ -91,9 +93,12 @@ void MX_ADC1_Init(void)
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = ADC_CHANNEL_COUNT;
   HAL_ADC_Init(&hadc1);
+  
+  // تفعيل مستشعر الحرارة الداخلي
+  ADC1->CR2 |= ADC_CR2_TSVREFE;
 
   // قناة 1: Throttle (PA6 = ADC_CHANNEL_6)
-  sConfig.Channel = ADC_CHANNEL_6;
+  sConfig.Channel = THROTTLE_CH;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;
   HAL_ADC_ConfigChannel(&hadc1, &sConfig);
@@ -104,15 +109,15 @@ void MX_ADC1_Init(void)
   HAL_ADC_ConfigChannel(&hadc1, &sConfig);
  */
   // قناة 3: Battery Voltage (مثلاً PA5 = ADC_CHANNEL_5)
-  sConfig.Channel = ADC_CHANNEL_5;
+  sConfig.Channel = BATTERY_V_CH;
   sConfig.Rank = ADC_REGULAR_RANK_3;
   HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-/* 
+
   // قناة 4: Temperature (مثلاً PA3 = ADC_CHANNEL_3)
-  sConfig.Channel = ADC_CHANNEL_3;
+  sConfig.Channel = ADC_CHANNEL_16;
   sConfig.Rank = ADC_REGULAR_RANK_4;
+  sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
   HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-   */
 }
 
 void MX_TIM3_Init(void)

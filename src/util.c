@@ -22,8 +22,9 @@ float readBatteryVoltage(void)
     return voltage;
 }
 
-/*
-l = 2308
-h = 3335
-
-*/
+float readInternalTemperature(void)
+{
+    float Vsense = (adcValues[3] / 4095.0f) * 3.3f;
+    float temperature = ((1.43f - Vsense) / 0.0043f) + 25.0f;
+    return temperature;
+}
