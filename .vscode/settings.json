@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "setup.h": "c",
-        "stm32f1xx_hal_uart.h": "c"
+        "stm32f1xx_hal_uart.h": "c",
+        "defines.h": "c",
+        "motor.h": "c"
     }
 }

@@ -5,6 +5,7 @@ void SystemClock_Config(void);
 extern UART_HandleTypeDef huart1;
 extern ADC_HandleTypeDef hadc1;
 extern TIM_HandleTypeDef htim1;
+extern uint16_t adcValues[ADC_CHANNEL_COUNT];
 
 
 float batteryVolt = 0;
@@ -39,8 +40,9 @@ int main(void)
   printf("before Start_PWM_TIM1\r\n");
   Start_PWM_TIM1();
 
+  // تشغيل ADC باستخدام DMA
   printf("before setupBLDC\r\n");
-  setupBLDC();
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adcValues, ADC_CHANNEL_COUNT);
 
   int printTimer = 0;
   printf("start Loop\r\n");
@@ -64,8 +66,6 @@ int main(void)
       //printf("hall state: %i \r\n", readHallState());
 
     } */
-
-    doMotorControl();
 
 
 
