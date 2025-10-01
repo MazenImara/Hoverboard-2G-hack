@@ -49,7 +49,7 @@ int main(void)
   printf("start Loop\r\n");
   while(1)
   {
-    printTimer++;
+/*     printTimer++;
     if (printTimer > 1000)
     {
       printTimer = 0;
@@ -66,7 +66,7 @@ int main(void)
        
       //printf("hall state: %i \r\n", readHallState());
 
-    }
+    } */
 
         if (getThrottlePercent() > 2)
         {

@@ -8,6 +8,8 @@ extern uint16_t adcValues[ADC_CHANNEL_COUNT];
 extern TIM_HandleTypeDef htim1;
 
 uint16_t pwm_duty = 0;
+int printfTimer = 0;
+float current;
 
 float readBatteryVoltage(void)
 {
@@ -152,4 +154,14 @@ void setPhaseVoltage(float angle_el, float voltage)
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, (uint32_t)(dutyA * arr));
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (uint32_t)(dutyB * arr));
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, (uint32_t)(dutyC * arr));
+
+    printfTimer++;
+    if (printfTimer > 100)
+    {
+        printfTimer = 0;
+        current = getCurrentAmps();
+        printf("duty A: %d, B: %d, C: %d  ==> I: %d.%02d\r\n", (uint32_t)(dutyA * arr), (uint32_t)(dutyB * arr), (uint32_t)(dutyC * arr), (int)current, (int)((current - (int)current) * 100));
+    }
+    
+
 }
