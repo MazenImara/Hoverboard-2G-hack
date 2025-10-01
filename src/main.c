@@ -5,9 +5,36 @@ void SystemClock_Config(void);
 extern UART_HandleTypeDef huart1;
 extern ADC_HandleTypeDef hadc1;
 extern uint16_t adcValues[ADC_CHANNEL_COUNT];
+extern TIM_HandleTypeDef htim1;
+
 
 float batteryVolt = 0;
 float temperature = 0;
+
+#define PI 3.14159265f
+float angle = 0.0f;
+void loopFOC_OpenTest()
+{
+    angle += 2.0f * PI * 0.005f; // السرعة الزاوية
+    if (angle >= 2.0f * PI) angle -= 2.0f * PI;
+    setPhaseVoltage(angle, 6.0f); // جهد نصف VBUS مثلاً
+    HAL_Delay(1);
+}
+
+
+void startupSequence(float duty, uint16_t steps, uint16_t delayMs)
+{
+    // تسلسل الحالات حسب الاتجاه الصحيح الذي رأيناه
+    uint8_t hallSequence[6] = {6, 4, 5, 1, 3, 2};
+
+    for (int i = 0; i < steps; i++)
+    {
+        uint8_t hall = hallSequence[i % 6];
+        commutate_safe(hall, duty);
+        HAL_Delay(delayMs);
+    }
+}
+
 
 int main(void)
 {
@@ -32,45 +59,46 @@ int main(void)
 
   power_on();
 
-  HAL_Delay(4000);
+  HAL_Delay(3000);
 
   printf("before Start_PWM_TIM1\r\n");
   Start_PWM_TIM1();
+
+
+
+
 
   int printTimer = 0;
   printf("start Loop\r\n");
   while(1)
   {
-    /* 
+
+
     printTimer++;
-    if (printTimer > 500)
+    if (printTimer > 100)
     {
       printTimer = 0;
+
       batteryVolt = readBatteryVoltage();
       temperature = readInternalTemperature();
+/* 
       printf("temperture.    : %d.%02d C\r\n", (int)temperature, (int)((temperature - (int)temperature) * 100));
       printf("Battery Voltage: %d.%02d V\r\n", (int)batteryVolt, (int)((batteryVolt - (int)batteryVolt) * 100));
       printf("Current        : %lu A\r\n", adcValues[1]); 
-          //printf("power btn: %.2f \r\n", HAL_GPIO_ReadPin(BREAK_PORT, BREAK_PIN));
+      printf("Throttle percent: %i \r\n", getThrottlePercent());
+       */
+      //printf("hall state: %i \r\n", readHallState());
+
     }
-     */
-    /* printf("Throttle        : %i \r\n", adcValues[0]); 
-    printf("Throttle percent: %i \r\n", getThrottlePercent()); 
+
     
-    HAL_Delay(200);
- */
-/*
-    uint8_t hall_a = HAL_GPIO_ReadPin(HALL_PORT, HALL_A_PIN);
-    uint8_t hall_b = HAL_GPIO_ReadPin(HALL_PORT, HALL_B_PIN);
-    uint8_t hall_c = HAL_GPIO_ReadPin(HALL_PORT, HALL_C_PIN);
+        
 
-    uint8_t hall_state = (hall_a << 2) | (hall_b << 1) | hall_c;
- */
-    //readHallSensors();
+    testHallSensors();
 
-    //set_commutation(hall_state);
 
-    //HAL_Delay(1);  // للتجربة فقط. لاحقًا نستخدم interrupt.
+
+
 
 
     if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN) 

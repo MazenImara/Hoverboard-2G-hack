@@ -43,12 +43,20 @@
 
 
 // High-side phases
-#define PHASE_U_HIGH_PORT GPIOA
 #define PHASE_U_HIGH_PIN  GPIO_PIN_10
-
-#define PHASE_V_HIGH_PORT GPIOA
 #define PHASE_V_HIGH_PIN  GPIO_PIN_9
-
-#define PHASE_W_HIGH_PORT GPIOA
 #define PHASE_W_HIGH_PIN  GPIO_PIN_8
+#define PHASE_HIGH_PORT GPIOA
 
+
+/* 
+green high -> PA10
+green low -> PB15
+
+blue high -> PA9
+blue low -> PB14
+
+yallow high -> PA8
+yallo low -> PB13
+
+ */

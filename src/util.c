@@ -1,9 +1,17 @@
 #include "util.h"
 
+// التعريفات
+#define PI 3.14159265f
+#define VBUS 12.0f // جهد البطارية
+#define PWM_PERIOD (64000000 / 2 / 16000)  // نفس اللي حددته في TIM1
+#define PWM_AMPLITUDE (PWM_PERIOD / 2.0f)  // نصف الموجة تقريبًا
+
 
 extern uint16_t adcValues[ADC_CHANNEL_COUNT];
 // PWM on Low-side (N outputs are TIM1_CH1N, CH2N, CH3N)
 extern TIM_HandleTypeDef htim1;
+
+uint16_t pwm_duty = 0;
 
 float readBatteryVoltage(void)
 {
@@ -31,17 +39,31 @@ float readInternalTemperature(void)
     return temperature;
 }
 
-uint8_t readHallSensors(void)
+uint8_t readHallState(void)
 {
-  uint8_t hallGA = HAL_GPIO_ReadPin(HALL_PORT, HALL_A_PIN);  // Green
-  uint8_t hallYB = HAL_GPIO_ReadPin(HALL_PORT, HALL_B_PIN);  // Yellow
-  uint8_t hallBC = HAL_GPIO_ReadPin(HALL_PORT, HALL_C_PIN);  // Blue
+    uint8_t hallA = HAL_GPIO_ReadPin(HALL_PORT, HALL_A_PIN);
+    uint8_t hallB = HAL_GPIO_ReadPin(HALL_PORT, HALL_B_PIN);
+    uint8_t hallC = HAL_GPIO_ReadPin(HALL_PORT, HALL_C_PIN);
 
-  uint8_t hallState = (hallBC << 2) | (hallYB << 1) | hallGA;
+    uint8_t state = (hallC << 2) | (hallB << 1) | hallA;
+    return state;
+}
 
-  printf("Hall A: %d, Hall B: %d, Hall C: %d => State: %d\r\n", hallGA, hallYB, hallBC, hallState);
+void testHallSensors(void)
+{
+    uint8_t lastState = 0xFF;  // قيمة غير صالحة بالبداية
 
-  return hallState;
+    while (1)
+    {
+        uint8_t state = readHallState();
+        if (state != lastState)
+        {
+            printf("Hall state: %d\r\n", state);
+            lastState = state;
+        }
+
+        HAL_Delay(50); // تأخير صغير لتسهيل القراءة
+    }
 }
 
 uint16_t getThrottlePercent(void)
@@ -64,53 +86,5 @@ uint16_t getThrottlePercent(void)
 
     return (uint8_t)percent;
 }
-void set_commutation(uint8_t hall_state)
-{
-    // أولًا: أوقف كل high-sides
-    HAL_GPIO_WritePin(PHASE_U_HIGH_PORT, PHASE_U_HIGH_PIN, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(PHASE_V_HIGH_PORT, PHASE_V_HIGH_PIN, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(PHASE_W_HIGH_PORT, PHASE_W_HIGH_PIN, GPIO_PIN_RESET);
 
-    // ثم: أوقف كل low-sides PWM
-    HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
-    HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_2);
-    HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_3);
-
-    // بناءً على الحالة، فعّل المطلوب
-    switch(hall_state)
-    {
-        case 1: // U+ V-
-            HAL_GPIO_WritePin(PHASE_U_HIGH_PORT, PHASE_U_HIGH_PIN, GPIO_PIN_SET);
-            HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);  // V-
-            break;
-
-        case 2: // U+ W-
-            HAL_GPIO_WritePin(PHASE_U_HIGH_PORT, PHASE_U_HIGH_PIN, GPIO_PIN_SET);
-            HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);  // W-
-            break;
-
-        case 3: // V+ W-
-            HAL_GPIO_WritePin(PHASE_V_HIGH_PORT, PHASE_V_HIGH_PIN, GPIO_PIN_SET);
-            HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);  // W-
-            break;
-
-        case 4: // V+ U-
-            HAL_GPIO_WritePin(PHASE_V_HIGH_PORT, PHASE_V_HIGH_PIN, GPIO_PIN_SET);
-            HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);  // U-
-            break;
-
-        case 5: // W+ U-
-            HAL_GPIO_WritePin(PHASE_W_HIGH_PORT, PHASE_W_HIGH_PIN, GPIO_PIN_SET);
-            HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);  // U-
-            break;
-
-        case 6: // W+ V-
-            HAL_GPIO_WritePin(PHASE_W_HIGH_PORT, PHASE_W_HIGH_PIN, GPIO_PIN_SET);
-            HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);  // V-
-            break;
-
-        default: // Invalid state
-            break;
-    }
-}
 
