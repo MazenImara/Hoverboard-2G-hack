@@ -128,3 +128,28 @@ void stopAllMotorOutputs(void)
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
 }
+
+void setPhaseVoltage(float angle_el, float voltage)
+{
+    float Ua = voltage * cosf(angle_el);
+    float Ub = voltage * cosf(angle_el - 2.0f * PI / 3.0f);
+    float Uc = voltage * cosf(angle_el - 4.0f * PI / 3.0f);
+
+    float dutyA = 0.5f + (Ua / (2.0f * VBUS));
+    float dutyB = 0.5f + (Ub / (2.0f * VBUS));
+    float dutyC = 0.5f + (Uc / (2.0f * VBUS));
+
+    // Clamp duty to [0, 1] just to be safe
+    if (dutyA > 1.0f) dutyA = 1.0f;
+    if (dutyA < 0.0f) dutyA = 0.0f;
+    if (dutyB > 1.0f) dutyB = 1.0f;
+    if (dutyB < 0.0f) dutyB = 0.0f;
+    if (dutyC > 1.0f) dutyC = 1.0f;
+    if (dutyC < 0.0f) dutyC = 0.0f;
+
+    uint32_t arr = __HAL_TIM_GET_AUTORELOAD(&htim1);
+
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, (uint32_t)(dutyA * arr));
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (uint32_t)(dutyB * arr));
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, (uint32_t)(dutyC * arr));
+}

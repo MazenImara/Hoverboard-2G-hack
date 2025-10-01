@@ -20,8 +20,6 @@ int main(void)
   MX_UART1_Init();
   MX_TIM3_Init();
   
-  
-  powerOn();
 
   for (size_t i = 0; i < 5; i++)
   {
@@ -29,18 +27,23 @@ int main(void)
   }
   
 
-/*   printf("before MX_TIM1_Init\r\n");
+  printf("before MX_TIM1_Init\r\n");
   MX_TIM1_Init();
 
   printf("before MX_TIM3_Init\r\n");
   MX_TIM3_Init();  
+  
+  powerOn();
 
   HAL_Delay(3000);
 
   printf("before Start_PWM_TIM1\r\n");
-  Start_PWM_TIM1(); */
+  Start_PWM_TIM1();
 
-  //stopAllMotorOutputs();
+
+    float angle = 0.0f;
+    float voltage = 4.0f; // جهد ثابت للتجربة
+    float electrical_velocity = 2.0f * PI * 10.0f / 1000.0f;
 
   int printTimer = 0;
   printf("start Loop\r\n");
@@ -65,7 +68,20 @@ int main(void)
 
     }
 
-    HAL_Delay(1);
+        if (getThrottlePercent() > 2)
+        {
+            angle += electrical_velocity;
+            if (angle > 2.0f * PI)
+                angle -= 2.0f * PI;
+
+            setPhaseVoltage(angle, voltage);
+        }
+        else
+        {
+            setPhaseVoltage(angle, 0.0f); // إيقاف الجهد بدون تعطيل PWM
+        }
+
+        HAL_Delay(1);
 
 
 
