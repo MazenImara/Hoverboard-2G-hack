@@ -7,6 +7,11 @@
 
 #define MAX_TEMPERATURE 64.9
 
+#define PI    3.1415926f
+#define VBUS  36.0f  // ✅ مهم: فولت البطارية
+#define CURRENT_OFFSET 0.95f  // حسب ملاحظتك في وضع السكون
+#define OVERCURRENT_LIMIT  15.0f
+
 
 #define FRONT_LED_PIN GPIO_PIN_13
 #define FRONT_LED_PORT GPIOC

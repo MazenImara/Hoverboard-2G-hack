@@ -4,37 +4,12 @@ void SystemClock_Config(void);
 
 extern UART_HandleTypeDef huart1;
 extern ADC_HandleTypeDef hadc1;
-extern uint16_t adcValues[ADC_CHANNEL_COUNT];
 extern TIM_HandleTypeDef htim1;
 
 
 float batteryVolt = 0;
 float temperature = 0;
-
-#define PI 3.14159265f
-float angle = 0.0f;
-void loopFOC_OpenTest()
-{
-    angle += 2.0f * PI * 0.005f; // السرعة الزاوية
-    if (angle >= 2.0f * PI) angle -= 2.0f * PI;
-    setPhaseVoltage(angle, 6.0f); // جهد نصف VBUS مثلاً
-    HAL_Delay(1);
-}
-
-
-void startupSequence(float duty, uint16_t steps, uint16_t delayMs)
-{
-    // تسلسل الحالات حسب الاتجاه الصحيح الذي رأيناه
-    uint8_t hallSequence[6] = {6, 4, 5, 1, 3, 2};
-
-    for (int i = 0; i < steps; i++)
-    {
-        uint8_t hall = hallSequence[i % 6];
-        commutate_safe(hall, duty);
-        HAL_Delay(delayMs);
-    }
-}
-
+float current = 0;
 
 int main(void)
 {
@@ -43,64 +18,58 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC1_Init();
   MX_UART1_Init();
+  MX_TIM3_Init();
+  
+  
+  powerOn();
 
-  printf("\r\n");
+  for (size_t i = 0; i < 5; i++)
+  {
+    printf("\r\n");
+  }
+  
 
-  printf("\r\n");
-
-  printf("\r\n");
-
-  printf("before MX_TIM1_Init\r\n");
+/*   printf("before MX_TIM1_Init\r\n");
   MX_TIM1_Init();
 
   printf("before MX_TIM3_Init\r\n");
-  MX_TIM3_Init();
-
-
-  power_on();
+  MX_TIM3_Init();  
 
   HAL_Delay(3000);
 
   printf("before Start_PWM_TIM1\r\n");
-  Start_PWM_TIM1();
+  Start_PWM_TIM1(); */
 
-
-
-
+  //stopAllMotorOutputs();
 
   int printTimer = 0;
   printf("start Loop\r\n");
   while(1)
   {
-
-
     printTimer++;
-    if (printTimer > 100)
+    if (printTimer > 1000)
     {
       printTimer = 0;
 
       batteryVolt = readBatteryVoltage();
       temperature = readInternalTemperature();
-/* 
+      current = getCurrentAmps();
+
       printf("temperture.    : %d.%02d C\r\n", (int)temperature, (int)((temperature - (int)temperature) * 100));
       printf("Battery Voltage: %d.%02d V\r\n", (int)batteryVolt, (int)((batteryVolt - (int)batteryVolt) * 100));
-      printf("Current        : %lu A\r\n", adcValues[1]); 
+      printf("Current        : %d.%02d \r\n", (int)current, (int)((current - (int)current) * 100));
+      
       printf("Throttle percent: %i \r\n", getThrottlePercent());
-       */
+       
       //printf("hall state: %i \r\n", readHallState());
 
     }
 
-    
-        
-
-    testHallSensors();
+    HAL_Delay(1);
 
 
 
-
-
-
+    currentProtect();
     if (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN) 
 /* 
       || batteryVolt < MIN_BATTERY_VOL 
@@ -109,7 +78,8 @@ int main(void)
        */
     )
     {
-      power_off();
+      while (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN)){}
+      powerOff();
     }
         
   }

@@ -1,10 +1,6 @@
 #include "util.h"
 
-// التعريفات
-#define PI 3.14159265f
-#define VBUS 12.0f // جهد البطارية
-#define PWM_PERIOD (64000000 / 2 / 16000)  // نفس اللي حددته في TIM1
-#define PWM_AMPLITUDE (PWM_PERIOD / 2.0f)  // نصف الموجة تقريبًا
+
 
 
 extern uint16_t adcValues[ADC_CHANNEL_COUNT];
@@ -30,6 +26,34 @@ float readBatteryVoltage(void)
     float voltage = Vmin + ((adcValue - ADCmin) * (Vmax - Vmin)) / (float)(ADCmax - ADCmin);
 
     return voltage;
+}
+
+float getCurrentAmps(void)
+{
+    uint16_t raw = adcValues[1];
+    float voltage = (3.3f * (float)raw) / 4095.0f;
+    float voltage_shunt = voltage / 10.0f; // إذا كان هناك مكبر gain=10
+    float current = voltage_shunt / 0.005f;
+
+    // تعويض الانحراف
+    current -= CURRENT_OFFSET;
+
+    // حماية من القراءة السالبة
+    if (current < 0.0f) current = 0.0f;
+
+    return current;
+}
+
+void currentProtect(void)
+{
+    float currentA = getCurrentAmps();
+    if (currentA > OVERCURRENT_LIMIT)
+    {
+        stopAllMotorOutputs();  // ← تطفئ المحرك تمامًا
+        printf("⚠️  Overcurrent detected! Current = %.2f A -> Stopping motor!\r\n", currentA);
+        
+        powerOff();
+    }    
 }
 
 float readInternalTemperature(void)
@@ -87,4 +111,20 @@ uint16_t getThrottlePercent(void)
     return (uint8_t)percent;
 }
 
+void stopAllMotorOutputs(void)
+{
+    // وقف القنوات الرئيسية (High side)
+    HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_3);
 
+    // وقف القنوات المكملة (Low side)
+    HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_2);
+    HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_3);
+
+    // إعادة المقارنات إلى الصفر (PWM = 0%)
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
+}
