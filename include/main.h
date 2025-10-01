@@ -9,3 +9,4 @@
 #include "power.h"
 #include "melody.h"
 #include "util.h"
+#include "motor.h"

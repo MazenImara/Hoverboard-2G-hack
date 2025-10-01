@@ -18,10 +18,8 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC1_Init();
   MX_UART1_Init();
-  MX_TIM3_Init();
   
   
-  powerOn();
 
   for (size_t i = 0; i < 5; i++)
   {
@@ -29,24 +27,26 @@ int main(void)
   }
   
 
-/*   printf("before MX_TIM1_Init\r\n");
+  printf("before MX_TIM1_Init\r\n");
   MX_TIM1_Init();
 
   printf("before MX_TIM3_Init\r\n");
   MX_TIM3_Init();  
+  powerOn();
 
   HAL_Delay(3000);
 
   printf("before Start_PWM_TIM1\r\n");
-  Start_PWM_TIM1(); */
+  Start_PWM_TIM1();
 
-  //stopAllMotorOutputs();
+  printf("before setupBLDC\r\n");
+  setupBLDC();
 
   int printTimer = 0;
   printf("start Loop\r\n");
   while(1)
   {
-    printTimer++;
+/*     printTimer++;
     if (printTimer > 1000)
     {
       printTimer = 0;
@@ -63,9 +63,9 @@ int main(void)
        
       //printf("hall state: %i \r\n", readHallState());
 
-    }
+    } */
 
-    HAL_Delay(1);
+    doMotorControl();
 
 
 
