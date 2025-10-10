@@ -11,6 +11,9 @@ float batteryVolt = 0;
 float temperature = 0;
 float current = 0;
 
+int printTimer = 0;
+int printDelay = 5000;
+
 int main(void)
 {
   HAL_Init();               
@@ -42,15 +45,13 @@ int main(void)
   printf("before setupBLDC\r\n");
   setupBLDC();
 
-  int printTimer = 0;
+
   printf("start Loop\r\n");
   while(1)
   {
-/*     printTimer++;
-    if (printTimer > 1000)
+    printTimer++;
+    if (printTimer > printDelay)
     {
-      printTimer = 0;
-
       batteryVolt = readBatteryVoltage();
       temperature = readInternalTemperature();
       current = getCurrentAmps();
@@ -63,9 +64,7 @@ int main(void)
        
       //printf("hall state: %i \r\n", readHallState());
 
-    } */
-
-    doMotorControl();
+    }
 
 
 
@@ -81,7 +80,7 @@ int main(void)
       while (HAL_GPIO_ReadPin(POWER_BTN_PORT, POWER_BTN_PIN)){}
       powerOff();
     }
-        
+    if (printTimer > printDelay) { printTimer = 0; }     
   }
 }
 
